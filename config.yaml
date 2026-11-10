@@ -1,0 +1,34 @@
+# TW-Quant-Desk 參數設定
+# Token 等機密請放 config.local.yaml（已 gitignore，同名鍵會覆蓋本檔）
+
+capital:
+  initial: 30000          # 總資金
+  budget: 10000           # 單筆投入
+
+cost:
+  fee_discount: 0.6       # 手續費折數
+  min_fee: 20             # 手續費低消（部分網路券商為 1 元）
+  half_spread: 0.0085     # 造市單邊價差（理論價 ±0.85%）
+  iv_crush: 0.0           # 出場委買 IV 下調（0.01 = 1 個 vol 點）
+
+backtest:
+  start: "2018-01-01"
+  max_holding_days: 5
+  take_profit: 0.40
+  stop_loss: -0.30
+  iv_premium: 1.15        # 造市 IV = HV20 × 1.15
+  stocks: ["2330", "2317", "2454", "2303", "2382", "3231", "2603"]
+  index: ["0050"]
+
+letf:                     # 00631L 拆股還原 / 合成正二淨值
+  start: "2014-10-01"     # 早於上市日（2014-10-31）則以合成淨值向前延伸
+  leverage: 2.0
+  fee: 0.007              # 年化管理費
+  roll_cost: null         # 年化轉倉成本；null = 以真實資料自動擬合
+  benchmark: TAIEX        # 合成淨值基準：TAIEX（追蹤誤差較小）或 0050
+
+tokens:
+  finmind: ""
+  telegram_bot: ""
+  telegram_chat_id: ""
+  line_channel_token: ""   # LINE Notify 已於 2025 停止服務，改用 Messaging API

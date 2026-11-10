@@ -1,0 +1,36 @@
+# 規格 3：台灣時間週一至週五 08:30 盤前預警、16:30 盤後日報（cron 為 UTC）
+name: daily-quant
+on:
+  # TODO: bot/notifier.py 與 --mode pre_market / post_market 完成後再取消註解，避免每天排程失敗
+  # schedule:
+  #   - cron: "30 0 * * 1-5"   # 08:30 TW → pre_market
+  #   - cron: "30 8 * * 1-5"   # 16:30 TW → post_market
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [pre_market, post_market]
+        default: post_market
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run
+        env:
+          FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LINE_CHANNEL_TOKEN: ${{ secrets.LINE_CHANNEL_TOKEN }}
+        run: |
+          MODE="${{ github.event.inputs.mode }}"
+          if [ -z "$MODE" ]; then
+            [ "${{ github.event.schedule }}" = "30 0 * * 1-5" ] && MODE=pre_market || MODE=post_market
+          fi
+          python main.py --mode "$MODE"
